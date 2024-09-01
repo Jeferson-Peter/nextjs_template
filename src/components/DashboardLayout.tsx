@@ -1,5 +1,14 @@
-import { ReactNode } from "react";
-import { Box, Flex, HStack, VStack, Text, Button, IconButton, useColorMode } from "@chakra-ui/react";
+import { ReactNode, useEffect } from "react";
+import {
+  Box,
+  Flex,
+  HStack,
+  VStack,
+  Text,
+  Button,
+  IconButton,
+  useColorMode,
+} from "@chakra-ui/react";
 import { FiMenu } from "react-icons/fi";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/router";
@@ -11,15 +20,24 @@ interface DashboardLayoutProps {
 }
 
 export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
-  const { user, logout } = useAuth();
-  console.log("user: ", user)
+  const { user, logout, isLoading } = useAuth();
   const router = useRouter();
   const { colorMode, toggleColorMode } = useColorMode();
+
+  useEffect(() => {
+    if (!isLoading && !user) {
+      router.push("/login");
+    }
+  }, [user, isLoading, router]);
 
   const handleLogout = async () => {
     await logout();
     router.push("/login");
   };
+
+  if (isLoading || !user) {
+    return null;
+  }
 
   return (
     <Flex height="100vh" flexDirection="column">
